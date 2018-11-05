@@ -19,7 +19,7 @@ export DOMAIN=$(echo $(hostname | cut -d'.' -f 3-))
 
 # We will be able to run the ansible-playbook by now. We start with the prerequisites. This is needed to pre-configure the nodes of the cluster.
 echo "Running the prerequisites"
-anisble-playbook -i ~/homework-openshift/inventory /usr/share/ansible/openshift-ansible/playbooks/prerequisites.yml
+ansible-playbook -i ~/homework-openshift/inventory /usr/share/ansible/openshift-ansible/playbooks/prerequisites.yml
 
 # After we ran the prerequisites we are able to start the deployment of the cluster.
 echo "Running the deploy_cluster playbook"
