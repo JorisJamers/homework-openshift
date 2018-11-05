@@ -37,8 +37,90 @@ ansible-playbook -i ~/homework-openshift/inventory /usr/share/ansible/openshift-
 echo "Getting the oc command for the bastion host"
 ansible masters[0] -b -m fetch -a "src=/root/.kube/config dest=/root/.kube/config flat=yes"
 
+# Now we log in to the cluster
+
+oc login -u system:admin
+
+# In the following commands we will create the PVS for the users
+
+mkdir -p /srv/nfs/user-vols/pv{1..200}
+
+echo "Create directories at the NFS server to be used as PVs in the OpenShift cluster.."
+
+for pvnum in {1..50} ; do
+  echo '/srv/nfs/user-vols/pv${pvnum} *(rw,root_squash)' >> /etc/exports.d/openshift-uservols.exports
+  chown -R nfsnobody.nfsnobody /srv/nfs
+  chmod -R 777 /srv/nfs
+done
+
+# Afterwards we will restart the nfs-server
+
+systemctl restart nfs-server
+
+# Create 25 definition files for 5G PVs
+
+export GUID=`hostname|awk -F. '{print $2}'`
+
+export volsize="5Gi"
+mkdir /root/pvs
+for volume in pv{1..25} ; do
+cat << EOF > /root/pvs/${volume}
+{
+  "apiVersion": "v1",
+  "kind": "PersistentVolume",
+  "metadata": {
+    "name": "${volume}"
+  },
+  "spec": {
+    "capacity": {
+        "storage": "${volsize}"
+    },
+    "accessModes": [ "ReadWriteOnce" ],
+    "nfs": {
+        "path": "/srv/nfs/user-vols/${volume}",
+        "server": "support1.${GUID}.internal"
+    },
+    "persistentVolumeReclaimPolicy": "Recycle"
+  }
+}
+EOF
+echo "Created def file for ${volume}";
+done;
+
+# Create 25 definition files for 10G pvs
+
+export GUID=`hostname|awk -F. '{print $2}'`
+
+export volsize="10Gi"
+for volume in pv{26..50} ; do
+cat << EOF > /root/pvs/${volume}
+{
+  "apiVersion": "v1",
+  "kind": "PersistentVolume",
+  "metadata": {
+    "name": "${volume}"
+  },
+  "spec": {
+    "capacity": {
+        "storage": "${volsize}"
+    },
+    "accessModes": [ "ReadWriteMany" ],
+    "nfs": {
+        "path": "/srv/nfs/user-vols/${volume}",
+        "server": "support1.${GUID}.internal"
+    },
+    "persistentVolumeReclaimPolicy": "Retain"
+  }
+}
+EOF
+echo "Created def file for ${volume}";
+done;
+
+# Create all the PVs from the definition files
+
+cat /root/pvs/* | oc create -f -
+
+
+
 # We are going to create a new project for the jenkins pod.
 oc new-project cicd-dev
-
-# Creating users : WIP
-ansible masters -a "htpasswd -b /etc/origin/master/htpasswd joris joris"
