@@ -12,4 +12,4 @@ You are able to deploy the entire Openshift Cluster with just one single command
 
         ./deploy-openshift.sh
 
-You can either run this in your homefolder or anywhere you want. 
+You can either run this in your homefolder or anywhere you want. If you do use the script provided with the repo please move it to your homefolder.
