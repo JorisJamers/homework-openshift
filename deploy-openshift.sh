@@ -37,4 +37,8 @@ ansible-playbook -i ~/homework-openshift/inventory /usr/share/ansible/openshift-
 echo "Getting the oc command for the bastion host"
 ansible masters[0] -b -m fetch -a "src=/root/.kube/config dest=/root/.kube/config flat=yes"
 
-oc get all
+# We are going to create a new project for the jenkins pod.
+oc new-project cicd-dev
+
+# Creating users : WIP
+ansible masters -a "htpasswd -b /etc/origin/master/htpasswd joris joris"
