@@ -2,6 +2,8 @@
 
 ################################################################################################
 # Openshift deploy script, running this script wil deploy a fully configured Openshift cluster.#
+# Author: Joris Jamers                                                                         #
+# Homework Assignment Red Hat Delivery Specialist                                              #
 ################################################################################################
 
 # Cloning the repo into a folder on the bastion host. With this repo we will be able to configure openshift and deploy it.
@@ -34,3 +36,5 @@ ansible-playbook -i ~/homework-openshift/inventory /usr/share/ansible/openshift-
 # The following command is used to get access to the oc command on the bastion host.
 echo "Getting the oc command for the bastion host"
 ansible masters[0] -b -m fetch -a "src=/root/.kube/config dest=/root/.kube/config flat=yes"
+
+oc get all
