@@ -17,10 +17,10 @@ export GUID=$(echo $(hostname | awk -F'.' '{ print $2 }'))
 echo "Getting the domain name"
 export DOMAIN=$(echo $(hostname | cut -d'.' -f 3-))
 
-# Here we will edit the inventory file with the GUID we got from the bastion host
+# Here we will edit the inventory file with the GUID we got from the bastion host.
 sed -i "s/\$GUID/${GUID}/g" ~/homework-openshift/inventory
 
-# Here we will edit the inventory file with the GUID we got from the bastion host
+# Here we will edit the inventory file with the GUID we got from the bastion host.
 sed -i "s/\$DOMAIN/${DOMAIN}/g" ~/homework-openshift/inventory
 
 # We will be able to run the ansible-playbook by now. We start with the prerequisites. This is needed to pre-configure the nodes of the cluster.
@@ -30,3 +30,7 @@ ansible-playbook -i ~/homework-openshift/inventory /usr/share/ansible/openshift-
 # After we ran the prerequisites we are able to start the deployment of the cluster.
 echo "Running the deploy_cluster playbook"
 ansible-playbook -i ~/homework-openshift/inventory /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml
+
+# The following command is used to get access to the oc command on the bastion host.
+echo "Getting the oc command for the bastion host"
+ansible masters[0] -b -m fetch -a "src=/root/.kube/config dest=/root/.kube/config flat=yes"
