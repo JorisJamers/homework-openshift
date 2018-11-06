@@ -139,5 +139,57 @@ echo "Creating the tasks-test project"
 oc new-project tasks-test
 echo "Creating the tasks-prod project"
 oc new-project tasks-prod
+echo "Creating the tasks-build project"
+oc new-project tasks-build
 
-# At this time we can start to prepare and deploy the openshift tasks
+# We are adding a policy to the jenkins role of cicd-dev to access the other projects.
+oc policy add-role-to-user edit system:serviceaccount:cicd-dev:jenkins -n tasks-dev
+oc policy add-role-to-user edit system:serviceaccount:cicd-dev:jenkins -n tasks-test
+oc policy add-role-to-user edit system:serviceaccount:cicd-dev:jenkins -n tasks-prod
+oc policy add-role-to-user edit system:serviceaccount:cicd-dev:jenkins -n tasks-build
+
+# We have to make sure that the other projects can pull images from the cicd-dev project.
+oc policy add-role-to-group system:image-puller system:serviceaccounts:tasks-dev -n cicd-dev
+oc policy add-role-to-group system:image-puller system:serviceaccounts:tasks-test -n cicd-dev
+oc policy add-role-to-group system:image-puller system:serviceaccounts:tasks-prod -n cicd-dev
+oc policy add-role-to-group system:image-puller system:serviceaccounts:tasks-build -n cicd-dev
+
+# At this time we can start to prepare and deploy the openshift tasks.
+
+# Import the openshift tasks template.
+echo "Importing tasks"
+oc project openshift
+oc apply -f https://raw.githubusercontent.com/OpenShiftDemos/openshift-tasks/master/app-template.yaml
+
+# Create the image streams.
+echo "Creating the image streams"
+oc project openshift
+oc apply -f https://raw.githubusercontent.com/jboss-openshift/application-templates/master/eap/eap64-image-stream.json
+
+# Install the openshift-tasks app.
+echo "Install openshift-tasks"
+oc project tasks-dev
+oc new-app openshift-tasks
+
+# Setup the bc for tasks.
+echo "Create the buildconfig for tasks"
+oc project cicd-dev
+oc apply -f ~/homework-openshift/yaml-files/jenkins-pipeline.yaml
+
+# There is a script used for the multitenancy. We will now run this provided script.
+./../scripts/multitenancy-script.sh
+
+# Now we are going to label the nodes for the proper projects. Node1 will be the alpha node and Node2 will be the beta node.
+# Node3 is going to be used by common.
+echo " Login As cluster Admin"
+oc login -u system:admin > /dev/null
+
+# Labeling our nodes so the node-selector will select the proper node.
+echo "Labeling for client alpha"
+oc label node node1.$GUID.internal client=alpha
+
+echo "Labeling for client beta"
+oc label node node2.$GUID.internal client=beta
+
+echo "Labeling for client common"
+oc label node node3.$GUID.internal client=common

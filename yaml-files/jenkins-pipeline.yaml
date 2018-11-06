@@ -1,0 +1,143 @@
+apiVersion: v1
+kind: BuildConfig
+metadata:
+  annotations:
+    pipeline.alpha.openshift.io/uses: '[{"name": "tasks", "namespace": "", "kind": "DeploymentConfig"}]'
+  labels:
+    name: tasks-bc
+  name: tasks-bc
+spec:
+  strategy:
+    jenkinsPipelineStrategy:
+      jenkinsfile: |-
+        def APP_NAME = 'openshift-tasks'
+        def BUILD_PROJECT ='tasks-build'
+        def DEV_PROJECT = 'tasks-dev'
+        def TEST_PROJECT = 'tasks-test'
+        def PROD_PROJECT = 'tasks-prod'
+
+        pipeline {
+          agent {
+            node {
+              label 'maven'
+            }
+          }
+          options {
+            timeout(time: 20, unit: 'MINUTES')
+          }
+          stages {
+            stage('build for dev') {
+              steps {
+                script {
+                  openshift.withCluster() {
+                    openshift.withProject(BUILD_PROJECT) {
+                      def bc = openshift.selector('bc', APP_NAME)
+                      def build = bc.startBuild()
+                      build.logs('-f')
+                    }
+                  }
+                }
+              }
+            }
+            stage('deploy to dev') {
+              steps {
+                script {
+                  openshift.withCluster() {
+                    openshift.withProject(DEV_PROJECT) {
+                      def dc = openshift.selector('dc', APP_NAME)
+                      dc.deploy()
+                    }
+                  }
+                }
+              }
+            }
+            stage('verify dev env') {
+              steps {
+                script {
+                  openshift.withCluster() {
+                    openshift.withProject(DEV_PROJECT) {
+                      def latestDeploymentVersion = openshift.selector('dc', APP_NAME).object().status.latestVersion
+                      def rc = openshift.selector('rc', "${APP_NAME}-${latestDeploymentVersion}")
+                      rc.untilEach(1) {
+                        def rcMap = it.object()
+                        return (rcMap.status.replicas.equals(rcMap.status.readyReplicas))
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            stage('promote to test env') {
+              steps {
+                script {
+                  openshift.withCluster() {
+                    openshift.withProject(TEST_PROJECT) {
+                      openshift.tag("${DEV_PROJECT}/${APP_NAME}:latest", "${TEST_PROJECT}/${APP_NAME}:latest")
+                      if (!openshift.selector("dc", APP_NAME).exists()) {
+                        openshift.newApp(APP_NAME)
+                        def svc = openshift.selector('svc', APP_NAME)
+                        svc.expose()
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            stage('verify test env') {
+              steps {
+                script {
+                  openshift.withCluster() {
+                    openshift.withProject(TEST_PROJECT) {
+                      def latestDeploymentVersion = openshift.selector('dc', APP_NAME).object().status.latestVersion
+                      def rc = openshift.selector('rc', "${APP_NAME}-${latestDeploymentVersion}")
+                      rc.untilEach(1) {
+                        def rcMap = it.object()
+                        return (rcMap.status.replicas.equals(rcMap.status.readyReplicas))
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            stage('promote to prod env') {
+              steps {
+                script {
+                  openshift.withCluster() {
+                    openshift.withProject(PROD_PROJECT) {
+                      openshift.tag("${TEST_PROJECT}/${APP_NAME}:latest", "${PROD_PROJECT}/${APP_NAME}:latest")
+                      if (!openshift.selector("dc", APP_NAME).exists()) {
+                        openshift.newApp(APP_NAME)
+                        def svc = openshift.selector('svc', APP_NAME)
+                        svc.expose()
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            stage('verify prod env') {
+              steps {
+                script {
+                  openshift.withCluster() {
+                    openshift.withProject(PROD_PROJECT) {
+                      def latestDeploymentVersion = openshift.selector('dc', APP_NAME).object().status.latestVersion
+                      def rc = openshift.selector('rc', "${APP_NAME}-${latestDeploymentVersion}")
+                      rc.untilEach(1) {
+                        def rcMap = it.object()
+                        return (rcMap.status.replicas.equals(rcMap.status.readyReplicas))
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+    type: JenkinsPipeline
+  triggers:
+  - github:
+      secret: CzgPZAZ5m2
+    type: GitHub
+  - generic:
+      secret: CzgPZAZ5m2
+type: Generic
