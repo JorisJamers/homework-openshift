@@ -41,7 +41,7 @@ ansible masters[0] -b -m fetch -a "src=/root/.kube/config dest=/root/.kube/confi
 oc login -u system:admin
 
 # In the following commands we will create the PVS for the users.
-ansible-playbook -i ~/homework-openshift/inventory ~/homework-openshift/create-pvs.yaml
+ansible-playbook -i ~/homework-openshift/inventory ~/homework-openshift/yaml-files/create-pvs.yaml
 
 # Afterwards we will restart the nfs-server.
 systemctl restart nfs-server
@@ -108,7 +108,7 @@ cat /root/pvs/* | oc create -f -
 #Fix NFS persistent volume recycling.
 oc project default
 echo "Applying the new project template"
-oc apply -f ~/homework-openshift/project-template.yaml
+oc apply -f ~/homework-openshift/yaml-files/project-template.yaml
 
 # Now we need to restart the master-api and the master-controllers.
 echo "Restarting atomic-openshift-master-api"
