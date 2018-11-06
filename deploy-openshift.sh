@@ -37,10 +37,10 @@ ansible-playbook -i ~/homework-openshift/inventory /usr/share/ansible/openshift-
 echo "Getting the oc command for the bastion host"
 ansible masters[0] -b -m fetch -a "src=/root/.kube/config dest=/root/.kube/config flat=yes"
 
-# Now we log in to the cluster
+# Now we log in to the cluster. 
 oc login -u system:admin
 
-# In the following commands we will create the PVS for the users
+# In the following commands we will create the PVS for the users.
 mkdir -p /srv/nfs/user-vols/pv{1..200}
 
 echo "Create directories at the NFS server to be used as PVs in the OpenShift cluster.."
@@ -51,10 +51,10 @@ for pvnum in {1..50} ; do
   chmod -R 777 /srv/nfs
 done
 
-# Afterwards we will restart the nfs-server
+# Afterwards we will restart the nfs-server.
 systemctl restart nfs-server
 
-# Create 25 definition files for 5G PVs
+# Create 25 definition files for 5G PVs.
 echo "Creating the template for 5G PVs"
 export volsize="5Gi"
 mkdir /root/pvs
@@ -82,7 +82,7 @@ EOF
 echo "Created def file for ${volume}";
 done;
 
-# Create 25 definition files for 10G pvs
+# Create 25 definition files for 10G pvs.
 echo "Creating the template for 10G PVs"
 export volsize="10Gi"
 for volume in pv{26..50} ; do
@@ -113,6 +113,17 @@ done;
 echo "Creating the PVs for the users"
 cat /root/pvs/* | oc create -f -
 
+#Fix NFS persistent volume recycling.
+oc project default
+echo "Applying the new project template"
+oc apply -f ~/homework-openshift/project-template.yaml
+
+# Now we need to restart the master-api and the master-controllers.
+echo "Restarting atomic-openshift-master-api"
+ansible masters -a "systemctl restart atomic-openshift-master-api"
+echo "Restarting atomic-openshift-master-controllers"
+ansible masters -a "systemctl restart atomic-openshift-master-controllers"
+
 # We will create the project for the nodejs-mongo-persistent.
 echo "Creating the project for the nodejs-mongo-persistent application"
 oc new-project smoke-test
@@ -121,5 +132,17 @@ oc new-project smoke-test
 echo "Deploying the nodejs-mongo-persistent application"
 oc new-app nodejs-mongo-persistent
 
-# We are going to create a new project for the jenkins pod.
+# We need to create a new project for the jenkins pipeline.
+echo "Creating the CICD project"
+oc new-project cicd
+
+# Now we are able to deploy the jenkins-persistent application.
+oc new-app jenkins-persistent
+
+# Afterwards we will create the 3 projects needed for the pipeline.
+echo "Creating cicd-dev"
 oc new-project cicd-dev
+echo "Creating cicd-test"
+oc new-project cicd-test
+echo "Creating cicd-prod"
+oc new-project cicd-prod
