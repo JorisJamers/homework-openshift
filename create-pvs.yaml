@@ -4,5 +4,7 @@
   tasks:
     - name: Create PVs script
       script: create-pvs.sh
+      become: true
     - name: Restarting NFS Server...
       shell: systemctl restart nfs-server
+      become: true
