@@ -125,16 +125,19 @@ echo "Deploying the nodejs-mongo-persistent application"
 oc new-app nodejs-mongo-persistent
 
 # We need to create a new project for the jenkins pipeline.
-echo "Creating the CICD project"
-oc new-project cicd
+echo "Creating the cicd-dev project"
+oc new-project cicd-dev
 
 # Now we are able to deploy the jenkins-persistent application.
+echo "Deploying jenkins-persistent on the cicd-dev project"
 oc new-app jenkins-persistent
 
 # Afterwards we will create the 3 projects needed for the pipeline.
-echo "Creating cicd-dev"
-oc new-project cicd-dev
-echo "Creating cicd-test"
-oc new-project cicd-test
-echo "Creating cicd-prod"
-oc new-project cicd-prod
+echo "Creating the tasks-dev project"
+oc new-project tasks-dev
+echo "Creating the tasks-test project"
+oc new-project tasks-test
+echo "Creating the tasks-prod project"
+oc new-project tasks-prod
+
+# At this time we can start to prepare and deploy the openshift tasks
