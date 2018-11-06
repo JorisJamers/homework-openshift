@@ -1,6 +1,5 @@
 #!/bin/bash
 
-sudo -i
 mkdir -p /srv/nfs/user-vols/pv{1..50}
 
 for pvnum in {1..50} ;
