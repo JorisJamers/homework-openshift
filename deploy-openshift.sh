@@ -37,19 +37,11 @@ ansible-playbook -i ~/homework-openshift/inventory /usr/share/ansible/openshift-
 echo "Getting the oc command for the bastion host"
 ansible masters[0] -b -m fetch -a "src=/root/.kube/config dest=/root/.kube/config flat=yes"
 
-# Now we log in to the cluster. 
+# Now we log in to the cluster.
 oc login -u system:admin
 
 # In the following commands we will create the PVS for the users.
-mkdir -p /srv/nfs/user-vols/pv{1..200}
-
-echo "Create directories at the NFS server to be used as PVs in the OpenShift cluster.."
-
-for pvnum in {1..50} ; do
-  echo '/srv/nfs/user-vols/pv${pvnum} *(rw,root_squash)' >> /etc/exports.d/openshift-uservols.exports
-  chown -R nfsnobody.nfsnobody /srv/nfs
-  chmod -R 777 /srv/nfs
-done
+ansible-playbook -i ~/homework-openshift/inventory ~/homework-openshift/create-pvs.yaml
 
 # Afterwards we will restart the nfs-server.
 systemctl restart nfs-server

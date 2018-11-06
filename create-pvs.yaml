@@ -1,0 +1,8 @@
+---
+- name: Create PVs for Users
+  hosts: nfs
+  tasks:
+    - name: Create PVs script
+      script: create-pvs.sh
+    - name: Restarting NFS Server...
+      shell: systemctl restart nfs-server
