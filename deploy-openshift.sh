@@ -205,7 +205,3 @@ ansible masters -a "htpasswd -b /etc/origin/master/htpasswd joris joris"
 # Let's give "joris" the cluster-admin role now, so we will be able to see all projects via this user.
 echo "Giving 'joris' the cluster-admin role"
 oc adm policy add-cluster-role-to-user cluster-admin joris
-
-# Now we start the tasks-bc build.
-echo "Starting the first build"
-oc start-build tasks-bc -n cicd-dev
