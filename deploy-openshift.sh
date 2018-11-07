@@ -143,16 +143,16 @@ echo "Creating the tasks-build project"
 oc new-project tasks-build
 
 # We are adding a policy to the jenkins role of cicd-dev to access the other projects.
-oc policy add-role-to-user edit system:serviceaccount:cicd-dev:jenkins -n tasks-dev
-oc policy add-role-to-user edit system:serviceaccount:cicd-dev:jenkins -n tasks-test
-oc policy add-role-to-user edit system:serviceaccount:cicd-dev:jenkins -n tasks-prod
-oc policy add-role-to-user edit system:serviceaccount:cicd-dev:jenkins -n tasks-build
+oc adm policy add-role-to-user edit system:serviceaccount:cicd-dev:jenkins -n tasks-dev
+oc adm policy add-role-to-user edit system:serviceaccount:cicd-dev:jenkins -n tasks-test
+oc adm policy add-role-to-user edit system:serviceaccount:cicd-dev:jenkins -n tasks-prod
+oc adm policy add-role-to-user edit system:serviceaccount:cicd-dev:jenkins -n tasks-build
 
 # We have to make sure that the other projects can pull images from the cicd-dev project.
-oc policy add-role-to-group system:image-puller system:serviceaccounts:tasks-dev -n cicd-dev
-oc policy add-role-to-group system:image-puller system:serviceaccounts:tasks-test -n cicd-dev
-oc policy add-role-to-group system:image-puller system:serviceaccounts:tasks-prod -n cicd-dev
-oc policy add-role-to-group system:image-puller system:serviceaccounts:tasks-build -n cicd-dev
+oc adm policy add-role-to-group system:image-puller system:serviceaccounts:tasks-dev -n cicd-dev
+oc adm policy add-role-to-group system:image-puller system:serviceaccounts:tasks-test -n cicd-dev
+oc adm policy add-role-to-group system:image-puller system:serviceaccounts:tasks-prod -n cicd-dev
+oc adm policy add-role-to-group system:image-puller system:serviceaccounts:tasks-build -n cicd-dev
 
 # At this time we can start to prepare and deploy the openshift tasks.
 
@@ -168,7 +168,7 @@ oc apply -f https://raw.githubusercontent.com/jboss-openshift/application-templa
 
 # Install the openshift-tasks app.
 echo "Install openshift-tasks"
-oc project tasks-dev
+oc project tasks-build
 oc new-app openshift-tasks
 
 # Setup the bc for tasks.
