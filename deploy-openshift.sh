@@ -195,13 +195,17 @@ echo "Labeling for client common"
 oc label node node3.$GUID.internal client=common
 
 # Login with the system admin so we can give the admin user the proper role.
-oc login -u system:admin
+echo "Login As cluster Admin"
+oc login -u system:admin > /dev/null
 
 # Now we create a new user so we can give him the cluster-admin role.
+echo "Creating admin user"
 ansible masters -a "htpasswd -b /etc/origin/master/htpasswd joris joris"
 
 # Let's give "joris" the cluster-admin role now, so we will be able to see all projects via this user.
+echo "Giving 'joris' the cluster-admin role"
 oc adm policy add-cluster-role-to-user cluster-admin joris
 
 # Now we start the tasks-bc build.
+echo "Starting the first build"
 oc start-build tasks-bc -n cicd-dev
