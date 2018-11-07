@@ -177,7 +177,7 @@ oc project cicd-dev
 oc apply -f ~/homework-openshift/yaml-files/jenkins-pipeline.yaml
 
 # There is a script used for the multitenancy. We will now run this provided script.
-sh ./../scripts/multitenancy-script.sh
+sh ~/homework-openshift/scripts/multitenancy-script.sh
 
 # Now we are going to label the nodes for the proper projects. Node1 will be the alpha node and Node2 will be the beta node.
 # Node3 is going to be used by common.
