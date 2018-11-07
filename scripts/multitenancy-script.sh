@@ -30,10 +30,7 @@ oc create clusterquota clusterquota-$OCP_USERNAME \
 
 done
 
-pwd=`pwd`
-export pwd=$pwd/template/template.yml
-echo "Create template from ${pwd}"
-oc create -f $pwd
+oc create -f ~/homework-openshift/template/template.yaml
 
 ansible masters -m shell -a "sed -i 's/projectRequestTemplate.*/projectRequestTemplate\: \"default\/project-request\"/g' /etc/origin/master/master-config.yaml"
 ansible masters -m shell -a'systemctl restart atomic-openshift-master-api'
