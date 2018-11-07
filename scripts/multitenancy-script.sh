@@ -1,8 +1,8 @@
 #!/bin/bash
 
-oc new-project common-project --display-name="Common Project" --node-selector="client=common"
-oc new-project alpha-project --display-name="Alpha Project" --node-selector="client=alpha"
-oc new-project beta-project --display-name="Beta Project" --node-selector="client=beta"
+oc adm new-project common-project --display-name="Common Project" --node-selector="client=common"
+oc adm new-project alpha-project --display-name="Alpha Project" --node-selector="client=alpha"
+oc adm new-project beta-project --display-name="Beta Project" --node-selector="client=beta"
 
 ansible masters -m shell -a 'htpasswd -b /etc/origin/master/htpasswd amy amy'
 ansible masters -m shell -a 'htpasswd -b /etc/origin/master/htpasswd andrew andrew'
