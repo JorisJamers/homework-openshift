@@ -30,8 +30,6 @@ oc create clusterquota clusterquota-$OCP_USERNAME \
 
 done
 
-oc create -f ~/homework-openshift/template/template.yaml
-
 ansible masters -m shell -a "sed -i 's/projectRequestTemplate.*/projectRequestTemplate\: \"default\/project-request\"/g' /etc/origin/master/master-config.yaml"
 ansible masters -m shell -a'systemctl restart atomic-openshift-master-api'
 ansible masters -m shell -a'systemctl restart atomic-openshift-master-controllers'
