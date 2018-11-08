@@ -144,9 +144,11 @@ oc new-project cicd-dev
 echo "Deploying jenkins-persistent on the cicd-dev project"
 oc new-app jenkins-persistent
 
-################################################################################################
-# WE NEED A CHECK IF JENKINS IS LIVE AT THIS POINT                                             #
-################################################################################################
+# We are going to check if jenkins is available. When the curl doesn't give us 302 we are going to sleep for 5 more seconds.
+
+while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' jenkins-cicd-dev.apps.$GUID.example.opentlc.com)" != "302" ]]; do
+  sleep 5;
+done
 
 # Afterwards we will create the 3 projects needed for the pipeline.
 for environment in ${ENVARRAY[@]}; do
@@ -213,8 +215,12 @@ ansible masters -a "htpasswd -b /etc/origin/master/htpasswd ${ADMIN_USER} ${ADMI
 echo "Giving '${ADMIN_USER}' the cluster-admin role"
 oc adm policy add-cluster-role-to-user cluster-admin ${ADMIN_USER}
 
+# Now we start the tasks-bc build.
+echo "Starting the first build"
+oc start-build tasks-bc -n cicd-dev
+
 # Configure the minimum request of the tasks pods, this is needed for the autoscale to work. Does not work yet, we need to deploy automatically first.
-#oc set resources dc tasks --requests=cpu=100m -n tasks-prod
+oc set resources dc tasks --requests=cpu=100m -n tasks-prod
 
 # As a last step we will deploy the HPA on the production environment. This is done by using the tasks-hpa yaml provided with this git repo.
 oc apply -f ~/homework-openshift/yaml-files/tasks-hpa.yaml -n tasks-prod
