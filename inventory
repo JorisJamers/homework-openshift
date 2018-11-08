@@ -34,7 +34,7 @@ openshift_master_overwrite_named_certificates=True
 # Set this line to enable NFS
 openshift_enable_unsupported_configurations=True
 
-# GlsuterFS version
+# GlusterFS version
 #  Knowledgebase
 #   https://access.redhat.com/solutions/3617551
 #  Bugzilla
@@ -205,7 +205,6 @@ masters
 etcd
 nodes
 nfs
-#glusterfs
 
 [lb]
 loadbalancer1.$GUID.internal
@@ -235,11 +234,5 @@ node1.$GUID.internal openshift_hostname=node1.$GUID.internal  openshift_node_lab
 node2.$GUID.internal openshift_hostname=node2.$GUID.internal  openshift_node_labels="{'env':'app', 'cluster': '$GUID'}"
 node3.$GUID.internal openshift_hostname=node3.$GUID.internal  openshift_node_labels="{'env':'app', 'cluster': '$GUID'}"
 
-## These are CNS nodes
-# support1.$GUID.internal openshift_hostname=support1.$GUID.internal  openshift_node_labels="{'env':'glusterfs', 'cluster': '$GUID'}"
-
 [nfs]
 support1.$GUID.internal openshift_hostname=support1.$GUID.internal
-
-#[glusterfs]
-# support1.$GUID.internal glusterfs_devices='[ "/dev/xvdd" ]'
