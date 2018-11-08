@@ -3,7 +3,7 @@
   hosts: nfs
   tasks:
     - name: Create PVs script
-      script: ../scripts/create-pvs.sh
+      script: ../scripts/create-nfs-shares.sh
       become: true
     - name: Restarting NFS Server...
       shell: systemctl restart nfs-server
