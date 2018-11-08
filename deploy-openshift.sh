@@ -11,6 +11,8 @@
 ################################################################################################
 
 ENVARRAY=(dev test prod build)
+ADMIN_USER=joris
+ADMIN_PASSWORD=joris
 
 # Getting the GUID from the server, this is needed to use in the inventory.
 echo "Getting the GUID"
@@ -201,8 +203,8 @@ oc login -u system:admin > /dev/null
 
 # Now we create a new user so we can give him the cluster-admin role.
 echo "Creating admin user"
-ansible masters -a "htpasswd -b /etc/origin/master/htpasswd joris joris"
+ansible masters -a "htpasswd -b /etc/origin/master/htpasswd ${ADMIN_USER} ${ADMIN_PASSWORD}"
 
 # Let's give "joris" the cluster-admin role now, so we will be able to see all projects via this user.
-echo "Giving 'joris' the cluster-admin role"
-oc adm policy add-cluster-role-to-user cluster-admin joris
+echo "Giving '${ADMIN_USER}' the cluster-admin role"
+oc adm policy add-cluster-role-to-user cluster-admin ${ADMIN_USER}
