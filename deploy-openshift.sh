@@ -209,5 +209,8 @@ ansible masters -a "htpasswd -b /etc/origin/master/htpasswd ${ADMIN_USER} ${ADMI
 echo "Giving '${ADMIN_USER}' the cluster-admin role"
 oc adm policy add-cluster-role-to-user cluster-admin ${ADMIN_USER}
 
+# Configure the minimum request of the tasks pods, this is needed for the autoscale to work. Does not work yet, we need to deploy automatically first. 
+#oc set resources dc tasks --requests=cpu=100m -n tasks-prod
+
 # As a last step we will deploy the HPA on the production environment. This is done by using the tasks-hpa yaml provided with this git repo.
-oc apply -f ~/homework-openshift/yaml-files/tasks-hpa.yaml -n tasks-prod 
+oc apply -f ~/homework-openshift/yaml-files/tasks-hpa.yaml -n tasks-prod
