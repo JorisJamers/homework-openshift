@@ -40,7 +40,7 @@ ansible masters[0] -b -m fetch -a "src=/root/.kube/config dest=/root/.kube/confi
 # Now we log in to the cluster.
 oc login -u system:admin
 
-# In the following commands we will create the PVS for the users.
+# In the following commands we will create the nfs shares for the users.
 ansible-playbook -i ~/homework-openshift/inventory ~/homework-openshift/yaml-files/create-nfs-shares.yaml
 
 # Afterwards we will restart the nfs-server.
