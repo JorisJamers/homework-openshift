@@ -6,13 +6,11 @@
 # Homework Assignment Red Hat Delivery Specialist                                              #
 ################################################################################################
 
-# Script variables
+################################################################################################
+# Script variables                                                                             #
+################################################################################################
 
 ENVARRAY=(dev test prod build)
-
-# Cloning the repo into a folder on the bastion host. With this repo we will be able to configure openshift and deploy it.
-echo "Cloning the git repo on the bastion host"
-git clone https://github.com/JorisJamers/homework-openshift.git
 
 # Getting the GUID from the server, this is needed to use in the inventory.
 echo "Getting the GUID"
@@ -22,6 +20,14 @@ export GUID=$(echo $(hostname | awk -F'.' '{ print $2 }'))
 # every column after the third one.
 echo "Getting the domain name"
 export DOMAIN=$(echo $(hostname | cut -d'.' -f 3-))
+
+################################################################################################
+# script                                                                                       #
+################################################################################################
+
+# Cloning the repo into a folder on the bastion host. With this repo we will be able to configure openshift and deploy it.
+echo "Cloning the git repo on the bastion host"
+git clone https://github.com/JorisJamers/homework-openshift.git
 
 # Here we will edit the inventory file with the GUID we got from the bastion host.
 sed -i "s/\$GUID/${GUID}/g" ~/homework-openshift/inventory
