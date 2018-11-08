@@ -6,6 +6,10 @@
 # Homework Assignment Red Hat Delivery Specialist                                              #
 ################################################################################################
 
+# Script variables
+
+ENVARRAY=(dev test prod build)
+
 # Cloning the repo into a folder on the bastion host. With this repo we will be able to configure openshift and deploy it.
 echo "Cloning the git repo on the bastion host"
 git clone https://github.com/JorisJamers/homework-openshift.git
@@ -133,29 +137,20 @@ echo "Deploying jenkins-persistent on the cicd-dev project"
 oc new-app jenkins-persistent
 
 # Afterwards we will create the 3 projects needed for the pipeline.
-echo "Creating the tasks-dev project"
-oc new-project tasks-dev
-echo "Creating the tasks-test project"
-oc new-project tasks-test
-echo "Creating the tasks-prod project"
-oc new-project tasks-prod
-echo "Creating the tasks-build project"
-oc new-project tasks-build
+for environment in ${ENVARRAY[@]}; do
+  echo "Creating the tasks-${environment} project"
+  oc new-project tasks-${environment}
+done
 
 # We are adding a policy to the jenkins role of cicd-dev to access the other projects.
-oc adm policy add-role-to-user edit system:serviceaccount:cicd-dev:jenkins -n tasks-dev
-oc adm policy add-role-to-user edit system:serviceaccount:cicd-dev:jenkins -n tasks-test
-oc adm policy add-role-to-user edit system:serviceaccount:cicd-dev:jenkins -n tasks-prod
-oc adm policy add-role-to-user edit system:serviceaccount:cicd-dev:jenkins -n tasks-build
-
-# We have to make sure that the other projects can pull images from the cicd-dev project.
-oc adm policy add-role-to-group system:image-puller system:serviceaccounts:tasks-dev -n cicd-dev
-oc adm policy add-role-to-group system:image-puller system:serviceaccounts:tasks-test -n cicd-dev
-oc adm policy add-role-to-group system:image-puller system:serviceaccounts:tasks-prod -n cicd-dev
-oc adm policy add-role-to-group system:image-puller system:serviceaccounts:tasks-build -n cicd-dev
+# we have to make sure that the other projects can pull images from the cicd-dev project.
+# This is all done in the forloop, using the bash var ENVARRAY. You can edit this array to get more environments.
+for environment in ${ENVARRAY[@]}; do
+  oc adm policy add-role-to-user edit system:serviceaccount:cicd-dev:jenkins -n tasks-${environment}
+  oc adm policy add-role-to-group system:image-puller system:serviceaccounts:tasks-${environment} -n cicd-dev
+done
 
 # At this time we can start to prepare and deploy the openshift tasks.
-
 # Import the openshift tasks template.
 echo "Importing tasks"
 oc project openshift
