@@ -145,8 +145,8 @@ echo "Deploying jenkins-persistent on the cicd-dev project"
 oc new-app jenkins-persistent
 
 # We are going to check if jenkins is available. When the curl doesn't give us 302 we are going to sleep for 5 more seconds.
-
 while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' jenkins-cicd-dev.apps.$GUID.$DOMAIN)" != "302" ]]; do
+  echo "I am waiting for jenkins to be deployed"
   sleep 5;
 done
 
