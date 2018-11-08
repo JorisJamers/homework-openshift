@@ -8,13 +8,13 @@ The __deploy-openshift.sh__ script in this repo is the same as the one delivered
 
 ### Script variables
 
-There are a few script vartiables you can use. These are default :
+There are a few script vartiables you can use. These are the defaults :
 
         ENVARRAY=(dev test prod build)
         ADMIN_USER=joris
         ADMIN_PASSWORD=joris
 
-The __ENVARRAY__ will make sure that all the environments are created. Whenever you need a new environment just add this to the array. The admin variables __ADMIN_USER__ and __ADMIN_PASSWORD__ are used to create the admin user at the end of the installations script. 
+The __ENVARRAY__ will make sure that all the environments are created. Whenever you need a new environment just add this to the array. The admin variables __ADMIN_USER__ and __ADMIN_PASSWORD__ are used to create the admin user at the end of the installations script.
 
 ### Execute the script
 
