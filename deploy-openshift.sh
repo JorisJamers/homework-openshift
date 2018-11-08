@@ -208,3 +208,6 @@ ansible masters -a "htpasswd -b /etc/origin/master/htpasswd ${ADMIN_USER} ${ADMI
 # Let's give "joris" the cluster-admin role now, so we will be able to see all projects via this user.
 echo "Giving '${ADMIN_USER}' the cluster-admin role"
 oc adm policy add-cluster-role-to-user cluster-admin ${ADMIN_USER}
+
+# As a last step we will deploy the HPA on the production environment. This is done by using the tasks-hpa yaml provided with this git repo.
+oc apply -f ~/homework-openshift/yaml-files/tasks-hpa.yaml -n tasks-prod 
