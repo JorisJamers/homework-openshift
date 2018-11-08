@@ -146,7 +146,7 @@ oc new-app jenkins-persistent
 
 # We are going to check if jenkins is available. When the curl doesn't give us 302 we are going to sleep for 5 more seconds.
 
-while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' jenkins-cicd-dev.apps.$GUID.example.opentlc.com)" != "302" ]]; do
+while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' jenkins-cicd-dev.apps.$GUID.$DOMAIN)" != "302" ]]; do
   sleep 5;
 done
 
