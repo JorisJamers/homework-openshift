@@ -4,6 +4,8 @@ This is a repository needed for the deployment and configuration of Openshift 3.
 
 ### Installation script
 
+        __IMPORTANT NOTE : Run the script as root on the bastion host__ 
+
 The __deploy-openshift.sh__ script in this repo is the same as the one delivered for the assignment. If neccesary the script is provided from the repository.
 
 ### Script variables
