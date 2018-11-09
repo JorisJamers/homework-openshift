@@ -8,5 +8,3 @@ do
  chown -R nfsnobody.nfsnobody  /srv/nfs
  chmod -R 777 /srv/nfs
 done
-
-systemctl restart nfs-server

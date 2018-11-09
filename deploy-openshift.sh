@@ -52,11 +52,9 @@ ansible masters[0] -b -m fetch -a "src=/root/.kube/config dest=/root/.kube/confi
 # Now we log in to the cluster.
 oc login -u system:admin
 
-# In the following commands we will create the nfs shares for the users.
+# In the following commands we will create the nfs shares for the users. The NFS server is going to be restarted in the yaml.
+# No need to do it again in this script. 
 ansible-playbook -i ~/homework-openshift/inventory ~/homework-openshift/yaml-files/create-nfs-shares.yaml
-
-# Afterwards we will restart the nfs-server.
-systemctl restart nfs-server
 
 # Create 25 definition files for 5G PVs.
 echo "Creating the template for 5G PVs"
